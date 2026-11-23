@@ -10,7 +10,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { getSender } from "./ChatLogics";
+import { addMessage, getSender } from "./ChatLogics";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import axios from "axios";
 import { API_URL } from "../config";
@@ -61,6 +61,7 @@ const [attachment, setAttachment] = useState(null);
 
       socket.emit("join chat", selectedChat._id);
     } catch (error) {
+      setLoading(false);
       toast({
         title: "Error Occured!",
         description: "Failed to Load the Messages",
@@ -102,7 +103,7 @@ const [attachment, setAttachment] = useState(null);
         );
         socket.emit("new message", data);
 
-        setMessages((prev) => [...prev, data]);
+        setMessages((prev) => addMessage(prev, data));
       } catch (error) {
         toast({
           title: "Error Occured!",
@@ -137,7 +138,7 @@ const [attachment, setAttachment] = useState(null);
         );
         setFetchAgain((prev) => !prev);
       } else {
-        setMessages((prev) => [...prev, newMessageRecieved]);
+        setMessages((prev) => addMessage(prev, newMessageRecieved));
       }
     };
 

@@ -1,4 +1,5 @@
 import {
+  addMessage,
   getSender,
   getSenderFull,
   isLastMessage,
@@ -42,5 +43,26 @@ describe("message grouping helpers", () => {
     expect(isSameUser(messages, messages[0], 0)).toBe(false);
     expect(isSameUser(messages, messages[1], 1)).toBe(true);
     expect(isSameUser(messages, messages[2], 2)).toBe(false);
+  });
+});
+
+describe("addMessage", () => {
+  const at = (id, iso) => ({ _id: id, createdAt: iso, sender: me });
+
+  test("appends a newer message at the end", () => {
+    const list = [at("1", "2026-01-01T10:00:00Z")];
+    expect(addMessage(list, at("2", "2026-01-01T10:00:05Z")).map((m) => m._id))
+      .toEqual(["1", "2"]);
+  });
+
+  test("puts a message whose reply arrived late in time order", () => {
+    const list = [at("1", "2026-01-01T10:00:00Z"), at("3", "2026-01-01T10:00:10Z")];
+    expect(addMessage(list, at("2", "2026-01-01T10:00:05Z")).map((m) => m._id))
+      .toEqual(["1", "2", "3"]);
+  });
+
+  test("ignores a message that is already in the list", () => {
+    const list = [at("1", "2026-01-01T10:00:00Z")];
+    expect(addMessage(list, at("1", "2026-01-01T10:00:00Z"))).toBe(list);
   });
 });

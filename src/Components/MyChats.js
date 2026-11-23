@@ -3,7 +3,7 @@ import { Box, Stack, Text } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { API_URL } from "../config";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getSender } from "./ChatLogics";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./GroupChatModal";
@@ -11,8 +11,6 @@ import { Button } from "@chakra-ui/react";
 import { ChatState } from "./ChatProvider";
 
 const MyChats = ({ fetchAgain }) => {
-  const [loggedUser, setLoggedUser] = useState();
-
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
   const toast = useToast();
@@ -29,7 +27,6 @@ const MyChats = ({ fetchAgain }) => {
         `${API_URL}/api/chat`,
         config
       );
-      console.log(data);
       setChats(data);
     } catch (error) {
       toast({
@@ -44,7 +41,6 @@ const MyChats = ({ fetchAgain }) => {
   };
 
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
     // eslint-disable-next-line
   }, [fetchAgain]);
@@ -98,8 +94,8 @@ const MyChats = ({ fetchAgain }) => {
               <Box
                 onClick={() => setSelectedChat(chat)}
                 cursor="pointer"
-                bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
-                color={selectedChat === chat ? "white" : "black"}
+                bg={selectedChat?._id === chat._id ? "#38B2AC" : "#E8E8E8"}
+                color={selectedChat?._id === chat._id ? "white" : "black"}
                 px={3}
                 py={2}
                 borderRadius="lg"
@@ -107,7 +103,7 @@ const MyChats = ({ fetchAgain }) => {
               >
                 <Text>
                   {!chat.isGroupChat
-                    ? getSender(loggedUser, chat.users)
+                    ? getSender(user, chat.users)
                     : chat.chatName}
                 </Text>
               </Box>

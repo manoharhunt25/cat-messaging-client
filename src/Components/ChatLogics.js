@@ -36,6 +36,19 @@ export const isSameUser = (messages, m, i) => {
   return i > 0 && messages[i - 1].sender._id === m.sender._id;
 };
 
+// Adds a message to the list in createdAt order, ignoring one already present.
+// Server replies can arrive out of order, so appending blindly can misorder
+// messages sent in quick succession.
+export const addMessage = (messages, message) => {
+  if (messages.some((m) => m._id === message._id)) return messages;
+  const time = (m) => new Date(m.createdAt).getTime() || 0;
+  const next = [...messages];
+  let i = next.length;
+  while (i > 0 && time(next[i - 1]) > time(message)) i--;
+  next.splice(i, 0, message);
+  return next;
+};
+
 export const getSender = (loggedUser, users) => {
   return users[0]?._id === loggedUser?._id ? users[1].name : users[0].name;
 };
