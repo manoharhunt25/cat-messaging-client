@@ -4,20 +4,24 @@ import { Badge } from "@chakra-ui/layout";
 const UserBadgeItem = ({ user, handleFunction }) => {
   return (
     <Badge
-      px={2}
+      display="inline-flex"
+      alignItems="center"
+      gap={1.5}
+      px={2.5}
       py={1}
-      borderRadius="lg"
+      borderRadius="full"
       m={1}
-      mb={2}
-      variant="solid"
-      fontSize={12}
-      colorScheme="yellow"
+      bg="black"
+      color="cat.500"
+      fontSize="xs"
+      textTransform="none"
       cursor="pointer"
+      _hover={{ bg: "ink.700" }}
       onClick={handleFunction}
+      title={`Remove ${user.name}`}
     >
       {user.name}
-      {/* {admin === user._id && <span> (Admin)</span>} */}
-      <CloseIcon pl={1} />
+      <CloseIcon boxSize="8px" />
     </Badge>
   );
 };

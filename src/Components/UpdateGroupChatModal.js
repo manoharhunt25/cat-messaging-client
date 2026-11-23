@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FormControl, Spinner, useDisclosure, useToast } from '@chakra-ui/react';
+import { FormControl, Spinner, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import {
     IconButton,
     Input,
@@ -203,25 +203,35 @@ const UpdateGroupChatModal = ({fetchAgain, setFetchAgain, fetchMessages}) => {
 
     return (
         <>
-          <IconButton display={{ base:"flex"}} icon={<ViewIcon/>} onClick={onOpen} />
+          <IconButton
+            display="flex"
+            icon={<ViewIcon />}
+            onClick={onOpen}
+            aria-label="Group settings"
+            variant="dark"
+          />
 
           <Modal onClose={onClose} isOpen={isOpen} isCentered>
-            <ModalOverlay/>
-            <ModalContent>
-              <ModalHeader
-                fontSize="26px"
-                fontFamily="Helvetica"
-                display="flex"
-                justifyContent="center"
-              >
-                {selectedChat.chatName}
-                </ModalHeader>
+            <ModalOverlay bg="blackAlpha.700" />
+            <ModalContent mx={3}>
+              <ModalHeader fontSize="xl">{selectedChat.chatName}</ModalHeader>
 
               <ModalCloseButton />
               <ModalBody
-               display="flex" 
-               flexDir="column" 
+               display="flex"
+               flexDir="column"
                alignItems="center">
+                <Text
+                  alignSelf="flex-start"
+                  fontSize="xs"
+                  fontWeight="700"
+                  color="ink.500"
+                  textTransform="uppercase"
+                  letterSpacing="0.08em"
+                  mb={1}
+                >
+                  Members
+                </Text>
                 <Box w="100%" display="flex" flexWrap="wrap" pb={3}>
                     {selectedChat.users.map((u) => (
                     <UserBadgeItem
@@ -235,14 +245,12 @@ const UpdateGroupChatModal = ({fetchAgain, setFetchAgain, fetchMessages}) => {
                 <FormControl display="flex">
                     <Input
                         placeholder="Chat Name"
-                        mb={3}
                         value={groupChatName}
                         onChange={(e) => setGroupChatName(e.target.value)}
                     />
                     <Button
-                        variant="solid"
-                        colorScheme="teal"
-                        ml={1}
+                        variant="dark"
+                        ml={2}
                         isLoading={renameloading}
                         onClick={handleRename}
                     >
@@ -257,7 +265,7 @@ const UpdateGroupChatModal = ({fetchAgain, setFetchAgain, fetchMessages}) => {
                     />
                 </FormControl>
                 {loading ? (
-                    <Spinner size="lg" />
+                    <Spinner size="lg" color="cat.500" my={3} />
                 ) : (
                     searchResult?.map((user) => (
                         <UserListItem
@@ -270,7 +278,7 @@ const UpdateGroupChatModal = ({fetchAgain, setFetchAgain, fetchMessages}) => {
 
               </ModalBody>
               <ModalFooter>
-                <Button onClick={()  => handleRemove(user)} colorScheme="red">
+                <Button onClick={()  => handleRemove(user)} colorScheme="red" variant="outline">
                   Leave Group
                 </Button>
               </ModalFooter>

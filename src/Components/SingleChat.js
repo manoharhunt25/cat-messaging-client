@@ -1,25 +1,28 @@
 // Import necessary libraries and components
-import { Box, Text } from "@chakra-ui/layout";
+import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
 import { ChatState } from "./ChatProvider";
 import React, { useEffect, useState } from "react";
 import {
+  Avatar,
   IconButton,
+  Image,
   Spinner,
-  FormControl,
   Input,
   useToast,
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { addMessage, getSender } from "./ChatLogics";
+import { addMessage, getSenderFull } from "./ChatLogics";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import axios from "axios";
 import { API_URL } from "../config";
 import "./styles.css";
 import ScrollableChat from "./ScrollableChat";
+import { GroupIcon, SendIcon } from "./Icons";
 import io from "socket.io-client";
 
 // Define the endpoint for socket connection
 const ENDPOINT = API_URL;
+
 
 // Define variables outside the component function
 let socket;
@@ -36,7 +39,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   // Get user and selectedChat from context
   const { user, selectedChat, setSelectedChat, setNotification } = ChatState();
-const [attachment, setAttachment] = useState(null);
 
   // Define function to fetch messages
   const fetchMessages = async () => {
@@ -83,7 +85,7 @@ const [attachment, setAttachment] = useState(null);
 
   // Function to handle message sending
   const sendMessage = async (event) => {
-    if (event.key === "Enter" && newMessage) {
+    if (event.key === "Enter" && newMessage.trim()) {
       //socket.emit("stop typing", selectedChat._id);
       try {
         const config = {
@@ -152,65 +154,85 @@ const [attachment, setAttachment] = useState(null);
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
   };
-const handleImageChange = (e) => {
-  setAttachment(e.target.files[0]);
-};
 
+  const otherUser =
+    selectedChat && !selectedChat.isGroupChat
+      ? getSenderFull(user, selectedChat.users)
+      : null;
 
   // Render component
   return (
     <>
-      {/* Conditional rendering based on selectedChat */}
       {selectedChat ? (
-        <>
-          {/* Chat header section */}
-          <Text
-            fontSize={{ base: "26px", md: "38px" }}
-            pb={3}
-            px={3}
-            w="100%"
-            fontFamily="Helvetica"
-            alignItems="center"
-            display="flex"
-            justifyContent="space-between"
+        <Flex direction="column" h="100%" w="100%">
+          {/* Chat header */}
+          <Flex
+            align="center"
+            gap={3}
+            px={{ base: 3, md: 5 }}
+            py={3}
+            borderBottom="1px solid"
+            borderColor="ink.100"
           >
             <IconButton
               display={{ base: "flex", md: "none" }}
               icon={<ArrowBackIcon />}
               onClick={() => setSelectedChat("")}
-              mr={5}
+              aria-label="Back to chats"
+              variant="ghost"
+              size="sm"
             />
-            {!selectedChat.isGroupChat ? (
-              <>{getSender(user, selectedChat.users)}</>
-            ) : (
-              <>
-                {selectedChat.chatName.toUpperCase()}
-                <UpdateGroupChatModal
-                  fetchAgain={fetchAgain}
-                  setFetchAgain={setFetchAgain}
-                  fetchMessages={fetchMessages}
-                />
-              </>
+            <Avatar
+              size="md"
+              name={otherUser ? otherUser.name : undefined}
+              src={otherUser?.pic}
+              icon={otherUser ? undefined : <GroupIcon fontSize="1.4rem" />}
+              bg="black"
+              color="cat.500"
+              border="3px solid"
+              borderColor="cat.500"
+            />
+            <Box minW={0} flex="1">
+              <Heading
+                as="h2"
+                fontSize={{ base: "lg", md: "xl" }}
+                textTransform="uppercase"
+                letterSpacing="0.02em"
+                noOfLines={1}
+              >
+                {otherUser ? otherUser.name : selectedChat.chatName}
+              </Heading>
+              <Text fontSize="sm" color="ink.500" noOfLines={1}>
+                {otherUser
+                  ? otherUser.email
+                  : `${selectedChat.users.length} members`}
+              </Text>
+            </Box>
+            {selectedChat.isGroupChat && (
+              <UpdateGroupChatModal
+                fetchAgain={fetchAgain}
+                setFetchAgain={setFetchAgain}
+                fetchMessages={fetchMessages}
+              />
             )}
-          </Text>
-          {/* Chat messages section */}
-          <Box
-            display="flex"
-            flexDir="column"
-            justifyContent="flex-end"
-            p={3}
-            bg="#E8E8E8"
-            w="100%"
-            h="100%"
-            borderRadius="lg"
-            overflowY="auto"
+          </Flex>
+
+          {/* Messages */}
+          <Flex
+            direction="column"
+            justify="flex-end"
+            flex="1"
+            minH={0}
+            px={{ base: 2, md: 5 }}
+            py={3}
+            bg="ink.50"
           >
-            {/* Loading spinner or chat messages */}
             {loading ? (
               <Spinner
                 size="xl"
-                w={20}
-                h={20}
+                thickness="4px"
+                color="cat.500"
+                emptyColor="ink.200"
                 alignSelf="center"
                 margin="auto"
               />
@@ -219,37 +241,72 @@ const handleImageChange = (e) => {
                 <ScrollableChat messages={messages} />
               </div>
             )}
-            {/* Input field for new message */}
-            <FormControl onKeyDown={sendMessage} isRequired mt={3}>
-              <Input
-                variant="filled"
-                bg="#E0E0E0"
-                placeholder="Enter a message here"
-                onChange={typingHandler}
-                value={newMessage}
-              ></Input>
-              <Input
-                type="file"
-                accept="image/"
-                onChange={handleImageChange}
-                ClassName="file-input"></Input>
-            </FormControl>
-            
+          </Flex>
 
-          </Box>
-        </>
+          {/* Composer */}
+          <Flex
+            as="form"
+            gap={2}
+            p={3}
+            borderTop="1px solid"
+            borderColor="ink.100"
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendMessage({ key: "Enter" });
+            }}
+          >
+            <Input
+              placeholder="Enter a message here"
+              onChange={typingHandler}
+              value={newMessage}
+              bg="white"
+              size="lg"
+              borderColor="ink.200"
+              _hover={{ borderColor: "ink.400" }}
+            />
+            <IconButton
+              type="submit"
+              variant="brand"
+              size="lg"
+              aria-label="Send message"
+              icon={<SendIcon />}
+              isDisabled={!newMessage.trim()}
+            />
+          </Flex>
+        </Flex>
       ) : (
-        // Placeholder text when no chat is selected
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
+        // Placeholder when no chat is selected
+        <Flex
+          direction="column"
+          align="center"
+          justify="center"
           h="100%"
+          w="100%"
+          bg="ink.50"
+          textAlign="center"
+          px={6}
         >
-          <Text fontSize="3xl" pb={3} fontFamily="Helvetica">
-            Click on a user to start chatting
+          <Image
+            src="/brand/cat-logo.png"
+            alt=""
+            h="90px"
+            opacity={0.9}
+            mb={6}
+          />
+          <Heading
+            as="h2"
+            fontSize="2xl"
+            textTransform="uppercase"
+            letterSpacing="0.02em"
+          >
+            Select a chat
+          </Heading>
+          <Box w="50px" h="4px" bg="cat.500" my={3} />
+          <Text color="ink.500" maxW="320px">
+            Pick a conversation on the left, or use Search User to start a new
+            one.
           </Text>
-        </Box>
+        </Flex>
       )}
     </>
   );

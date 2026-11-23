@@ -1,9 +1,13 @@
-import { Box, Text } from "@chakra-ui/layout";
+import { Box, Flex, Text } from "@chakra-ui/layout";
 import {
+  Badge,
   Drawer,
   DrawerBody,
   DrawerContent,
+  DrawerHeader,
   DrawerOverlay,
+  IconButton,
+  Image,
   Avatar,
   Menu,
   MenuButton,
@@ -15,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { getSender } from "./ChatLogics";
-import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { BellIcon, ChevronDownIcon, SearchIcon } from "@chakra-ui/icons";
 import { Button } from "@chakra-ui/button";
 import React, { useState } from "react";
 import { ChatState } from "./ChatProvider";
@@ -128,43 +132,110 @@ const SideDrawer = () => {
 
   return (
     <>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        bg="white"
+      <Flex
+        as="header"
+        align="center"
+        justify="space-between"
+        bg="black"
+        color="white"
         w="100%"
-        p="5px 10px 5px 10px"
-        borderWidth="5px"
+        h="64px"
+        px={{ base: 3, md: 5 }}
+        borderBottom="4px solid"
+        borderColor="cat.500"
+        gap={3}
       >
+        {/* Brand */}
+        <Flex align="center" gap={3} flexShrink={0}>
+          <Flex
+            bg="white"
+            borderRadius="md"
+            h="40px"
+            px={2}
+            align="center"
+            justify="center"
+          >
+            <Image src="/brand/cat-logo.png" alt="CAT" h="32px" />
+          </Flex>
+          <Text
+            fontFamily="heading"
+            fontWeight="700"
+            fontSize="lg"
+            letterSpacing="0.15em"
+            textTransform="uppercase"
+            display={{ base: "none", sm: "block" }}
+          >
+            Messaging
+          </Text>
+        </Flex>
+
+        {/* Search */}
         <Tooltip
           label="Search users to start chatting"
           hasArrow
-          placement="bottom-end"
+          placement="bottom"
         >
-          <Button variant="ghost" onClick={onOpen}>
-            <i className="fas fa-search"></i>
-            <Text display={{ base: "none", md: "flex" }} px="4">
-              Search User
-            </Text>
+          <Button
+            onClick={onOpen}
+            flex={{ base: "0 0 auto", md: "0 1 360px" }}
+            justifyContent="flex-start"
+            bg="ink.800"
+            color="ink.300"
+            fontWeight="400"
+            border="1px solid"
+            borderColor="ink.600"
+            _hover={{ bg: "ink.700", borderColor: "cat.500", color: "white" }}
+            leftIcon={<SearchIcon color="cat.500" />}
+            aria-label="Search User"
+          >
+            <Text display={{ base: "none", md: "block" }}>Search User</Text>
           </Button>
         </Tooltip>
-        <Text fontSize="2xl" fontFamily="Work sans">
-          Messages
-        </Text>
-        <div>
+
+        {/* Notifications and profile */}
+        <Flex align="center" gap={1} flexShrink={0}>
           <Menu>
-            <MenuButton p={1} aria-label="Notifications">
-              <BellIcon fontSize="2xl" m={1} />
-            </MenuButton>
-            <MenuList pl={2}>
-              {!notification.length && "No New Messages"}
+            <MenuButton
+              as={IconButton}
+              variant="ghost"
+              aria-label="Notifications"
+              color="cat.500"
+              _hover={{ bg: "ink.700" }}
+              _active={{ bg: "ink.700" }}
+              position="relative"
+              icon={
+                <>
+                  <BellIcon fontSize="2xl" />
+                  {notification.length > 0 && (
+                    <Badge
+                      position="absolute"
+                      top="2px"
+                      right="2px"
+                      bg="cat.500"
+                      color="black"
+                      borderRadius="full"
+                      fontSize="0.65rem"
+                      minW="18px"
+                      textAlign="center"
+                    >
+                      {notification.length}
+                    </Badge>
+                  )}
+                </>
+              }
+            />
+            <MenuList color="black" py={1}>
+              {!notification.length && (
+                <Text px={3} py={2} color="ink.500">
+                  No new messages
+                </Text>
+              )}
               {notification.map((notif) => (
-                <MenuItem 
+                <MenuItem
                   key={notif._id}
                   onClick={() => {
-                  setSelectedChat(notif.chat);
-                  setNotification(notification.filter((n) => n !== notif));
+                    setSelectedChat(notif.chat);
+                    setNotification(notification.filter((n) => n !== notif));
                   }}
                 >
                   {notif.chat.isGroupChat
@@ -177,36 +248,69 @@ const SideDrawer = () => {
           <Menu>
             <MenuButton
               as={Button}
-              rightIcon={<ChevronDownIcon />}
+              variant="ghost"
+              px={2}
+              _hover={{ bg: "ink.700" }}
+              _active={{ bg: "ink.700" }}
+              rightIcon={<ChevronDownIcon color="white" />}
               aria-label="Profile menu"
             >
-              <Avatar size="sm" cursor="pointer" name={user.name} src={user.pic} />
+              <Avatar
+                size="sm"
+                bg="cat.500"
+                color="black"
+                name={user.name}
+                src={user.pic}
+              />
             </MenuButton>
-            <MenuList>
-              <MenuItem isDisabled>
+            <MenuList color="black">
+              <MenuItem isDisabled opacity="1 !important" cursor="default">
                 <Box>
                   <Text fontWeight="bold">{user.name}</Text>
-                  <Text fontSize="xs">{user.email}</Text>
+                  <Text fontSize="xs" color="ink.500">
+                    {user.email}
+                  </Text>
                 </Box>
               </MenuItem>
               <MenuDivider />
               <MenuItem onClick={logoutHandler}>Logout</MenuItem>
             </MenuList>
           </Menu>
-        </div>
-      </Box>
+        </Flex>
+      </Flex>
       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
         <DrawerOverlay />
-        <DrawerContent borderBottomWidth="1px">
-          <DrawerBody>
-            <Box display="flex" pb={2}>
+        <DrawerContent>
+          <DrawerHeader
+            bg="black"
+            color="white"
+            borderBottom="4px solid"
+            borderColor="cat.500"
+            fontFamily="heading"
+            textTransform="uppercase"
+            letterSpacing="0.05em"
+          >
+            Search Users
+          </DrawerHeader>
+          <DrawerBody pt={4}>
+            <Box
+              as="form"
+              display="flex"
+              pb={3}
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSearch();
+              }}
+            >
               <Input
                 placeholder="Search by name"
                 mr={2}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-              <Button onClick={handleSearch}>Go</Button>
+              <Button type="submit" variant="brand">
+                Go
+              </Button>
             </Box>
             {loading ? (
               <ChatLoading />
@@ -221,7 +325,7 @@ const SideDrawer = () => {
                 ))}
               </>
             )}
-            {loadingChat && <Spinner ml="auto" display="flex" />}
+            {loadingChat && <Spinner ml="auto" display="flex" color="cat.500" />}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

@@ -126,9 +126,10 @@ const submitHandler = async () => {
       </FormControl>
       
        <Button
-        colorScheme = "blue"
+        variant="brand"
+        size="lg"
         width = "100%"
-        style={{marginTop: 15}}
+        mt={4}
         onClick={submitHandler}
       >
         Signup

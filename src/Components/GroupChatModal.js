@@ -1,5 +1,5 @@
 import { Modal, ModalOverlay,ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,} from "@chakra-ui/react";
-import { Button, FormControl, Input, useToast, Box } from "@chakra-ui/react";
+import { Button, FormControl, Input, Spinner, useToast, Box } from "@chakra-ui/react";
 import { useDisclosure } from "@chakra-ui/hooks";
 import React, { useState } from 'react'
 import { ChatState } from "./ChatProvider";
@@ -125,17 +125,10 @@ const GroupChatModal = ({children}) => {
     <>
       <span onClick={onOpen}>{children}</span>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader
-            fontSize="25px"
-            fontFamily="Work sans"
-            display="flex"
-            justifyContent="center"
-          >
-            Create Group Chat
-          </ModalHeader>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay bg="blackAlpha.700" />
+        <ModalContent mx={3}>
+          <ModalHeader fontSize="xl">Create Group Chat</ModalHeader>
           <ModalCloseButton />
           <ModalBody display="flex" flexDir="column" alignItems="center">
             <FormControl>
@@ -163,8 +156,7 @@ const GroupChatModal = ({children}) => {
               ))}
             </Box>
             {loading ? (
-              // <ChatLoading />
-              <div>Loading...</div>
+              <Spinner color="cat.500" my={3} />
             ) : (
               searchResult
                 ?.slice(0, 4)
@@ -179,7 +171,7 @@ const GroupChatModal = ({children}) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="yellow" onClick={handleSubmit}>
+            <Button variant="brand" onClick={handleSubmit}>
               Create Chat
             </Button>
           </ModalFooter>

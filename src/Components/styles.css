@@ -1,6 +1,11 @@
 .messages {
-    display: flex;
-    flex-direction: column;
-    overflow-y: scroll;
-    scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* The scrolling element inside react-scrollable-feed: keep bubbles off the scrollbar */
+.messages > div {
+  padding-right: 10px;
 }

@@ -24,7 +24,7 @@ const Login = () => {
         status: "warning",
         duration: 5000,
         isClosable: true,
-        position: "bottom",
+        position: "top",
       });
      setLoading(false);
       return;
@@ -48,7 +48,7 @@ const Login = () => {
         status: "success",
         duration: 5000,
         isClosable: true,
-        position: "bottom",
+        position: "top",
       });
       //setUser(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
@@ -62,7 +62,7 @@ const Login = () => {
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: "bottom",
+        position: "top",
       });
       setLoading(false);
     }
@@ -96,9 +96,10 @@ const Login = () => {
         </InputGroup>
       </FormControl>
       <Button
-        colorScheme="blue"
+        variant="brand"
+        size="lg"
         width="100%"
-        style={{ marginTop: 15 }}
+        mt={4}
         onClick={submitHandler}
         isLoading={loading}
       >

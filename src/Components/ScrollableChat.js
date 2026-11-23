@@ -7,7 +7,12 @@ import {
   isSameUser,
 } from "./ChatLogics";
 import { ChatState } from "./ChatProvider";
-import { Avatar, Tooltip } from "@chakra-ui/react";
+import { Avatar, Box, Text, Tooltip } from "@chakra-ui/react";
+
+const formatTime = (iso) => {
+  const d = new Date(iso);
+  return isNaN(d) ? "" : d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+};
 
 const ScrollableChat = ({ messages }) => {
   const { user } = ChatState();
@@ -27,23 +32,60 @@ const ScrollableChat = ({ messages }) => {
                   cursor="pointer"
                   name={m.sender.name}
                   src={m.sender.pic}
+                  bg="black"
+                  color="cat.500"
+                  alignSelf="flex-end"
                 />
               </Tooltip>
             )}
-            <span
-              style={{
-                backgroundColor:
-                  m.sender._id === user._id ? "#BEE3F8" : "#B9F5D0", //Color Choices
-                borderRadius: "20px",
-                padding: "5px 15px",
-                maxWidth: "200px",
-                wordWrap: "break-word",
-                marginLeft: isSameSenderMargin(messages, m, i, user._id),
-                marginTop: isSameUser(messages, m, i, user._id) ? 3 : 10,
-              }}
-            >
-              {m.content}
-            </span>
+            {(() => {
+              const mine = m.sender._id === user._id;
+              const showName =
+                !mine && m.chat?.isGroupChat && !isSameUser(messages, m, i);
+              return (
+                <Box
+                  as="span"
+                  bg={mine ? "cat.500" : "white"}
+                  color="black"
+                  border="1px solid"
+                  borderColor={mine ? "cat.500" : "ink.100"}
+                  boxShadow="0 1px 2px rgba(0,0,0,0.06)"
+                  borderRadius="16px"
+                  borderBottomRightRadius={mine ? "4px" : "16px"}
+                  borderBottomLeftRadius={mine ? "16px" : "4px"}
+                  px={3.5}
+                  py={2}
+                  maxW={{ base: "80%", md: "65%" }}
+                  wordBreak="break-word"
+                  ml={isSameSenderMargin(messages, m, i, user._id)}
+                  mt={isSameUser(messages, m, i, user._id) ? "3px" : "10px"}
+                >
+                  {showName && (
+                    <Text
+                      as="span"
+                      display="block"
+                      fontSize="xs"
+                      fontWeight="700"
+                      color="ink.600"
+                      mb={0.5}
+                    >
+                      {m.sender.name}
+                    </Text>
+                  )}
+                  {m.content}
+                  <Text
+                    as="span"
+                    display="block"
+                    textAlign="right"
+                    fontSize="2xs"
+                    color={mine ? "ink.700" : "ink.400"}
+                    mt={0.5}
+                  >
+                    {formatTime(m.createdAt)}
+                  </Text>
+                </Box>
+              );
+            })()}
           </div>
         ))}
     </ScrollableFeed>
