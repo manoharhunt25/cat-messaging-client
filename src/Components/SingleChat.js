@@ -76,7 +76,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   };
   // Initialize socket connection
   useEffect(() => {
-    socket = io(ENDPOINT);
+    socket = io(ENDPOINT, { auth: { token: user.token } });
     socket.emit("setup", user);
     return () => {
       socket.disconnect();
@@ -99,7 +99,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           `${API_URL}/api/message`,
           {
             content: newMessage,
-            chatId: selectedChat,
+            chatId: selectedChat._id,
           },
           config
         );

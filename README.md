@@ -33,7 +33,7 @@ A real-time team chat web app with one-to-one and group conversations, styled wi
 ### Prerequisites
 
 - **Node.js 18 or newer**, tested on Node 26
-- The **[cat-messaging-server](https://github.com/manoharhunt25/cat-messaging-server)** running, by default on `http://localhost:4000`
+- The **[cat-messaging-server](https://github.com/manoharhunt25/cat-messaging-server)** running, by default on `http://localhost:4000`. Use an up-to-date copy: the client logs in to the server's real-time connection with its token, which older server versions don't support.
 
 ### Install and run
 
